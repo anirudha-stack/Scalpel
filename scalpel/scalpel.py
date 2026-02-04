@@ -1,5 +1,8 @@
 """Main Scalpel class - entry point for the library."""
 
+from datetime import datetime, timezone
+import logging
+from pathlib import Path
 from typing import Optional, Callable, List
 
 from scalpel.config import ScalpelConfig
@@ -12,10 +15,12 @@ from scalpel.output.base import OutputFormatter
 from scalpel.output.markdown_formatter import MarkdownFormatter
 from scalpel.utils.token_counter import TokenCounter
 from scalpel.utils.retry import RetryHandler
+from scalpel.utils.llm_debug_logger import LLMDebugLogger
 from scalpel.pipeline.orchestrator import PipelineOrchestrator
 from scalpel.pipeline.stages import (
     ParseStage,
     SegmentStage,
+    AtomizeStage,
     BoundaryDetectStage,
     BoundaryValidateStage,
     ChunkFormStage,
@@ -24,6 +29,7 @@ from scalpel.pipeline.stages import (
 )
 from scalpel.exceptions import ScalpelConfigError
 
+logger = logging.getLogger(__name__)
 
 class Scalpel:
     """Main Scalpel class for semantic document chunking."""
@@ -112,10 +118,30 @@ class Scalpel:
         Returns:
             ScalpelResult with chunks and metadata
         """
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+        input_name = Path(input_file).stem or "input"
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        run_id = f"{input_name}_{timestamp}"
+        debug_log_path = output_path / f"Scalpel_llm_debug_{run_id}.jsonl"
+        debug_logger = LLMDebugLogger(
+            log_path=debug_log_path,
+            run_id=run_id,
+            input_path=input_file,
+            model=self._llm_provider.model_name,
+        )
+        if hasattr(self._llm_provider, "set_debug_logger"):
+            self._llm_provider.set_debug_logger(debug_logger)
+        else:
+            logger.info(
+                "LLM provider does not support debug logging; skipping LLM prompt log."
+            )
+
         # Build pipeline stages
         stages = [
             ParseStage(),
             SegmentStage(),
+            AtomizeStage(),
             BoundaryDetectStage(
                 embedding_provider=self._embedding_provider,
                 threshold=self._config.similarity_threshold,

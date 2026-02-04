@@ -6,6 +6,7 @@ from typing import Optional, Dict, Any
 
 from scalpel.llm.base import LLMProvider, LLMResponse
 from scalpel.exceptions import ScalpelLLMError
+from scalpel.utils.llm_debug_logger import LLMDebugLogger
 
 
 class OpenAIProvider(LLMProvider):
@@ -39,6 +40,7 @@ class OpenAIProvider(LLMProvider):
         self._model = model
         self._temperature = temperature
         self._max_tokens = max_tokens
+        self._debug_logger: Optional[LLMDebugLogger] = None
 
         client_kwargs: Dict[str, Any] = {"api_key": api_key}
         if base_url:
@@ -73,6 +75,14 @@ class OpenAIProvider(LLMProvider):
 
             content = response.choices[0].message.content or ""
             tokens_used = response.usage.total_tokens if response.usage else 0
+            if self._debug_logger:
+                self._debug_logger.log_call(
+                    prompt=prompt,
+                    system_prompt=system_prompt,
+                    response_content=content,
+                    tokens_used=tokens_used,
+                    success=True,
+                )
 
             return LLMResponse(
                 content=content,
@@ -82,6 +92,15 @@ class OpenAIProvider(LLMProvider):
             )
 
         except Exception as e:
+            if self._debug_logger:
+                self._debug_logger.log_call(
+                    prompt=prompt,
+                    system_prompt=system_prompt,
+                    response_content="",
+                    tokens_used=0,
+                    success=False,
+                    error=str(e),
+                )
             return LLMResponse(
                 content="",
                 tokens_used=0,
@@ -132,3 +151,7 @@ class OpenAIProvider(LLMProvider):
     def model_name(self) -> str:
         """Return the model name being used."""
         return self._model
+
+    def set_debug_logger(self, debug_logger: Optional[LLMDebugLogger]) -> None:
+        """Attach a debug logger to record prompt/response traces."""
+        self._debug_logger = debug_logger

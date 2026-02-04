@@ -1,14 +1,25 @@
 """Prompt templates for boundary validation."""
 
-BOUNDARY_VALIDATION_SYSTEM = """You are an expert at analyzing document structure and logical coherence.
-Your task is to determine if a proposed chunk boundary between two text segments is appropriate.
-A good boundary separates distinct logical units or topics.
-A bad boundary splits a continuous thought or related concepts.
+BOUNDARY_VALIDATION_SYSTEM = """You are an expert at semantic chunking for retrieval (RAG).
+Your task is to decide whether a proposed boundary between two adjacent text segments should be a chunk split.
+
+Priorities (most important first):
+1) Topic purity: Prefer separating distinct subtopics into different chunks, even if they share a broader theme.
+2) Coherence: Do NOT split a continuous thought where the second segment is clearly a continuation, example,
+   definition, or immediate elaboration of the first.
+3) Retrievability: Avoid creating tiny fragments that only make sense with the previous segment (e.g., segments
+   starting with anaphora like "this/these/both/together", or purely transitional/summary sentences).
+
+Guidance:
+- KEEP if the second segment introduces a new operational subtopic (policy area, process step, responsibility,
+  risk, exception, measurement, etc.).
+- MERGE only if the split would reduce clarity or break a single unified point.
+- When unsure, lean KEEP.
 
 You must respond with valid JSON only, no additional text."""
 
 BOUNDARY_VALIDATION_TEMPLATE = """Below is a proposed chunk boundary in a document.
-Analyze whether these segments should be separate chunks.
+Analyze whether these segments should be separate chunks for retrieval.
 
 END OF CURRENT CHUNK:
 \"\"\"

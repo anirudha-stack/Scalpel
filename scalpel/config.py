@@ -68,6 +68,13 @@ class ScalpelConfig:
     llm_max_tokens: int = 1000
     """Maximum tokens for LLM response."""
 
+    # Fine-grained segmentation (optional)
+    atomize_sentences_per_paragraph: int = 2
+    """If >0, split long paragraphs into sentence groups of this size before boundary detection."""
+
+    atomize_min_sentences: int = 6
+    """Only atomize paragraphs that have at least this many sentences."""
+
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         self._validate()
@@ -104,6 +111,18 @@ class ScalpelConfig:
                 "short_document_threshold",
             )
 
+        if self.atomize_sentences_per_paragraph < 0:
+            raise ScalpelConfigError(
+                f"atomize_sentences_per_paragraph must be >= 0, got {self.atomize_sentences_per_paragraph}",
+                "atomize_sentences_per_paragraph",
+            )
+
+        if self.atomize_min_sentences < 0:
+            raise ScalpelConfigError(
+                f"atomize_min_sentences must be >= 0, got {self.atomize_min_sentences}",
+                "atomize_min_sentences",
+            )
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "ScalpelConfig":
         """Create configuration from dictionary."""
@@ -118,6 +137,12 @@ class ScalpelConfig:
             )
             flat_data["min_chunk_tokens"] = chunking.get("min_tokens", 50)
             flat_data["max_chunk_tokens"] = chunking.get("max_tokens", 500)
+            flat_data["atomize_sentences_per_paragraph"] = chunking.get(
+                "atomize_sentences_per_paragraph", 2
+            )
+            flat_data["atomize_min_sentences"] = chunking.get(
+                "atomize_min_sentences", 6
+            )
 
         if "behavior" in data:
             behavior = data["behavior"]
@@ -153,6 +178,8 @@ class ScalpelConfig:
             "llm_model",
             "llm_temperature",
             "llm_max_tokens",
+            "atomize_sentences_per_paragraph",
+            "atomize_min_sentences",
         ]:
             if key in data and key not in flat_data:
                 flat_data[key] = data[key]
@@ -210,4 +237,6 @@ class ScalpelConfig:
             "llm_model": self.llm_model,
             "llm_temperature": self.llm_temperature,
             "llm_max_tokens": self.llm_max_tokens,
+            "atomize_sentences_per_paragraph": self.atomize_sentences_per_paragraph,
+            "atomize_min_sentences": self.atomize_min_sentences,
         }

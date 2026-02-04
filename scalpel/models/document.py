@@ -15,6 +15,7 @@ class Paragraph:
     element_type: ElementType = ElementType.PARAGRAPH
     is_atomic: bool = False
     language: Optional[str] = None  # For code blocks
+    source_index: Optional[int] = None  # Original paragraph index (after atomization)
 
     @property
     def is_splittable(self) -> bool:

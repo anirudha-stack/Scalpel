@@ -104,7 +104,9 @@ class ChunkFormStage(PipelineStage):
 
         for para in paragraphs:
             content_parts.append(para.text)
-            source_indices.append(para.index)
+            source_indices.append(
+                para.source_index if para.source_index is not None else para.index
+            )
 
         # Join with appropriate separators
         content = "\n\n".join(content_parts)
