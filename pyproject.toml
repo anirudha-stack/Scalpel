@@ -1,0 +1,126 @@
+[project]
+name = "scalpel"
+version = "1.0.0"
+description = "Semantic document chunking library"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Scalpel Authors"}
+]
+keywords = ["chunking", "semantic", "document", "nlp", "rag", "llm"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    # Embedding
+    "sentence-transformers>=2.2.0",
+    "torch>=2.0.0",
+
+    # LLM
+    "openai>=1.0.0",
+
+    # Token counting
+    "tiktoken>=0.5.0",
+
+    # Document parsing
+    "pymupdf>=1.23.0",
+    "markdown-it-py>=3.0.0",
+
+    # Data validation
+    "pydantic>=2.0.0",
+
+    # Utilities
+    "python-dotenv>=1.0.0",
+    "rich>=13.0.0",
+    "click>=8.0.0",
+
+    # Type hints
+    "typing-extensions>=4.0.0",
+
+    # YAML support
+    "pyyaml>=6.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "hypothesis>=6.0.0",
+
+    # Code quality
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+
+    # Documentation
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+
+azure = [
+    "openai[azure]>=1.0.0",
+]
+
+anthropic = [
+    "anthropic>=0.18.0",
+]
+
+all = [
+    "scalpel[dev,azure,anthropic]",
+]
+
+[project.scripts]
+scalpel = "scalpel.cli.main:cli"
+
+[project.urls]
+Homepage = "https://github.com/scalpel/scalpel"
+Documentation = "https://scalpel.readthedocs.io"
+Repository = "https://github.com/scalpel/scalpel"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["scalpel*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311', 'py312']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --cov=scalpel --cov-report=term-missing"
