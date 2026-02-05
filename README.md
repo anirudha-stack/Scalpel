@@ -161,6 +161,12 @@ Distributed_12_Topic_Semantic_Document.pdf
   -> final semantic chunks: 14
 ```
 
+### Visual Chunking (PDF ↔ Chunks)
+
+Side-by-side visualization: the source PDF with chunk-colored overlays (left) and the corresponding chunks with matching colors (right).
+
+<img src="docs/images/chunking_visual_demo.png" width="1000" alt="Scalpel chunking visualization: PDF highlights and chunk list" />
+
 ### Example Output: 14 Chunks
 
 Below is an example chunk set produced from `Distributed_12_Topic_Semantic_Document.pdf` (titles + token counts taken from generated output):
