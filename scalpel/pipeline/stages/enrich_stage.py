@@ -144,12 +144,17 @@ class EnrichStage(PipelineStage):
         # Count tokens
         token_count = self._token_counter.count(chunk.content)
 
+        keywords = self._normalize_keywords(result.get("keywords", []))
+        questions = self._normalize_questions(result.get("questions", []))
+        questions = self._ensure_question_keyword_coverage(questions, keywords)
+
         return ChunkMetadata(
             chunk_id=chunk_id,
             title=result.get("title", "Untitled"),
             summary=result.get("summary", ""),
             intent=Intent.from_string(result.get("intent", "unknown")),
-            keywords=result.get("keywords", []),
+            questions=questions,
+            keywords=keywords,
             parent_section=parent_section,
             token_count=token_count,
         )
@@ -174,12 +179,16 @@ class EnrichStage(PipelineStage):
         # Count tokens
         token_count = self._token_counter.count(chunk.content)
 
+        keywords = self._extract_simple_keywords(chunk.content)
+        questions = self._fallback_questions(keywords)
+
         return ChunkMetadata(
             chunk_id=chunk_id,
             title=title,
             summary="Content summary unavailable",
             intent=Intent.UNKNOWN,
-            keywords=self._extract_simple_keywords(chunk.content),
+            questions=questions,
+            keywords=keywords,
             parent_section=parent_section,
             token_count=token_count,
         )
@@ -220,3 +229,135 @@ class EnrichStage(PipelineStage):
 
         sorted_words = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
         return [word for word, _ in sorted_words[:max_keywords]]
+
+    @staticmethod
+    def _normalize_questions(value) -> List[str]:
+        """Normalize LLM-provided questions into a clean list of strings."""
+        if value is None:
+            return []
+
+        if isinstance(value, str):
+            # Split on newlines / bullet-like prefixes; fall back to a single item.
+            raw = [v.strip(" \t-•") for v in value.splitlines() if v.strip()]
+            if not raw:
+                raw = [value.strip()] if value.strip() else []
+            value = raw
+
+        if not isinstance(value, list):
+            return []
+
+        out: List[str] = []
+        for item in value:
+            if not isinstance(item, str):
+                continue
+            q = item.strip()
+            if not q:
+                continue
+            if not q.endswith("?"):
+                q = q + "?"
+            out.append(q)
+
+        # Deduplicate (case-insensitive) while keeping order.
+        seen = set()
+        deduped: List[str] = []
+        for q in out:
+            key = q.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(q)
+
+        return deduped[:8]
+
+    @staticmethod
+    def _fallback_questions(keywords: List[str]) -> List[str]:
+        """Generate simple fallback questions from extracted keywords."""
+        kws = [k.strip() for k in (keywords or []) if isinstance(k, str) and k.strip()]
+        if not kws:
+            return []
+
+        primary = kws[0]
+        rest = ", ".join(kws[1:4])
+
+        questions = [f"What is {primary}?"]
+        if rest:
+            questions.append(f"How does {primary} relate to {rest}?")
+        if len(kws) >= 2:
+            questions.append(f"Explain {kws[1]}.")
+
+        normalized = []
+        for q in questions:
+            q = q.strip()
+            if not q:
+                continue
+            if not q.endswith("?"):
+                q += "?"
+            normalized.append(q)
+        return normalized[:6]
+
+    @staticmethod
+    def _normalize_keywords(value) -> List[str]:
+        """Normalize LLM-provided keywords into a clean list of strings."""
+        if value is None:
+            return []
+
+        if isinstance(value, str):
+            value = [v.strip() for v in value.split(",") if v.strip()]
+
+        if not isinstance(value, list):
+            return []
+
+        out: List[str] = []
+        for item in value:
+            if not isinstance(item, str):
+                continue
+            k = item.strip()
+            if not k:
+                continue
+            out.append(k)
+
+        # Deduplicate while preserving order.
+        seen = set()
+        deduped: List[str] = []
+        for k in out:
+            key = k.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(k)
+
+        return deduped[:12]
+
+    @staticmethod
+    def _ensure_question_keyword_coverage(
+        questions: List[str], keywords: List[str], *, max_questions: int = 8
+    ) -> List[str]:
+        """Ensure generated questions cover most keywords (best-effort).
+
+        The LLM is asked to include key terms in questions, but some models
+        occasionally omit them. We add lightweight fallback questions to cover
+        uncovered keywords without making additional LLM calls.
+        """
+        qs = [q for q in (questions or []) if isinstance(q, str) and q.strip()]
+        kws = [k for k in (keywords or []) if isinstance(k, str) and k.strip()]
+        if not kws:
+            return qs[:max_questions]
+
+        def _covered(qs_: List[str], kw_: str) -> bool:
+            needle = kw_.lower()
+            return any(needle in q.lower() for q in qs_)
+
+        uncovered = [k for k in kws if not _covered(qs, k)]
+
+        # If we already cover most keywords, don't add noise.
+        if len(uncovered) <= max(1, len(kws) // 3):
+            return qs[:max_questions]
+
+        for kw in uncovered:
+            if len(qs) >= max_questions:
+                break
+            q = f"Explain {kw}?"
+            if q.lower() not in {existing.lower() for existing in qs}:
+                qs.append(q)
+
+        return qs[:max_questions]

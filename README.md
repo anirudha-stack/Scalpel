@@ -131,6 +131,9 @@ chunk_id: chunk_001
 title: Example Chunk Title
 summary: 1-2 sentence summary of the chunk.
 intent: explains
+questions:
+- What question would a user ask to retrieve this chunk?
+- Another question phrased differently using key terms?
 keywords:
 - keyword1
 - keyword2

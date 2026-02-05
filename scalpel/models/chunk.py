@@ -17,6 +17,7 @@ class ChunkMetadata:
     keywords: List[str]
     parent_section: str
     token_count: int
+    questions: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
@@ -25,6 +26,7 @@ class ChunkMetadata:
             "title": self.title,
             "summary": self.summary,
             "intent": self.intent.value,
+            "questions": self.questions,
             "keywords": self.keywords,
             "parent_section": self.parent_section,
             "token_count": self.token_count,
@@ -42,6 +44,7 @@ class ChunkMetadata:
             title=data.get("title", ""),
             summary=data.get("summary", ""),
             intent=Intent.from_string(data.get("intent", "unknown")),
+            questions=data.get("questions", []),
             keywords=data.get("keywords", []),
             parent_section=data.get("parent_section", ""),
             token_count=data.get("token_count", 0),

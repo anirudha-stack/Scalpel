@@ -18,6 +18,7 @@ Respond with a JSON object:
     "title": "Concise, descriptive title (5-10 words)",
     "summary": "1-2 sentence summary of the main point",
     "intent": "explains" | "lists" | "warns" | "defines" | "instructs" | "compares",
+    "questions": ["question1", "question2", ...], // 3-6 user-style questions that this chunk answers
     "keywords": ["keyword1", "keyword2", ...] // 3-7 relevant terms
 }}
 
@@ -31,6 +32,10 @@ Guidelines:
   - defines: Provides definitions
   - instructs: Gives step-by-step instructions
   - compares: Compares or contrasts items
+- Questions:
+  - Each question should be answerable using only this chunk (no outside context required).
+  - Use natural phrasing people would type into search or a chatbot.
+  - Across the set, cover as many of the important keywords as possible (don't repeat the same wording).
 - Keywords: Terms someone might search for to find this content
 
 Respond with JSON only."""
