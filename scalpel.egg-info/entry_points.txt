@@ -1,2 +1,0 @@
-[console_scripts]
-scalpel = scalpel.cli.main:cli

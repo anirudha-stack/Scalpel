@@ -1,12 +1,12 @@
 [project]
-name = "scalpel"
+name = "microtome"
 version = "1.0.0"
 description = "Semantic document chunking library"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.9"
 authors = [
-    {name = "Scalpel Authors"}
+    {name = "Microtome Authors"}
 ]
 keywords = ["chunking", "semantic", "document", "nlp", "rag", "llm"]
 classifiers = [
@@ -82,16 +82,16 @@ anthropic = [
 ]
 
 all = [
-    "scalpel[dev,azure,anthropic]",
+    "microtome[dev,azure,anthropic]",
 ]
 
 [project.scripts]
-scalpel = "scalpel.cli.main:cli"
+microtome = "microtome.cli.main:cli"
 
 [project.urls]
-Homepage = "https://github.com/scalpel/scalpel"
-Documentation = "https://scalpel.readthedocs.io"
-Repository = "https://github.com/scalpel/scalpel"
+Homepage = "https://github.com/microtome/microtome"
+Documentation = "https://microtome.readthedocs.io"
+Repository = "https://github.com/microtome/microtome"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
@@ -99,7 +99,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["scalpel*"]
+include = ["microtome*"]
 
 [tool.black]
 line-length = 100
@@ -123,4 +123,4 @@ disallow_untyped_defs = true
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
-addopts = "-v --cov=scalpel --cov-report=term-missing"
+addopts = "-v --cov=microtome --cov-report=term-missing"
