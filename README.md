@@ -55,16 +55,16 @@ print("output:", result.output_path)
 
 ```mermaid
 flowchart LR
-  A[Input: PDF / MD / TXT] --> B[Parse]
-  B --> C[Segment: paragraphs]
-  C --> D[Atomize (optional): sentence groups]
-  D --> E[Embedding similarity]
-  E --> F[Propose boundaries]
-  F --> G[LLM validates boundaries]
-  G --> H[Form chunks]
-  H --> I[LLM enriches metadata]
-  I --> J[Write output: Markdown + YAML frontmatter]
-  I --> K[Write trace: JSONL prompt/response log (provider-supported)]
+  A["Input: PDF / MD / TXT"] --> B["Parse"]
+  B --> C["Segment: paragraphs"]
+  C --> D["Atomize (optional): sentence groups"]
+  D --> E["Embedding similarity"]
+  E --> F["Propose boundaries"]
+  F --> G["LLM validates boundaries"]
+  G --> H["Form chunks"]
+  H --> I["LLM enriches metadata"]
+  I --> J["Write output: Markdown + YAML frontmatter"]
+  I --> K["Write trace: JSONL prompt/response log (provider-supported)"]
 ```
 
 ```mermaid
@@ -77,7 +77,7 @@ sequenceDiagram
 
   D->>P: parse(input)
   P->>P: segment(paragraphs)
-  P->>P: atomize(optional)
+  P->>P: atomize (optional)
   P->>E: embed(text units)
   E-->>P: adjacent similarities
   P->>L: validate(boundary candidates)
