@@ -1,8 +1,8 @@
-# Microtome
+# Segmenta
 
 Semantic document chunking for retrieval (RAG), search, and downstream analytics.
 
-Microtome transforms unstructured documents (PDF, Markdown, plain text) into semantically isolated chunks enriched with structured metadata. It is built as a composable pipeline with pluggable embedding + LLM providers and enterprise-friendly observability (including prompt/response traces when supported by the provider).
+Segmenta transforms unstructured documents (PDF, Markdown, plain text) into semantically isolated chunks enriched with structured metadata. It is built as a composable pipeline with pluggable embedding + LLM providers and enterprise-friendly observability (including prompt/response traces when supported by the provider).
 
 ## What You Get
 
@@ -21,28 +21,28 @@ Microtome transforms unstructured documents (PDF, Markdown, plain text) into sem
 ## Installation
 
 ```bash
-pip install microtome
+pip install segmenta
 ```
 
 From source:
 
 ```bash
-git clone https://github.com/your-org/microtome.git
-cd microtome
+git clone https://github.com/your-org/segmenta.git
+cd segmenta
 pip install -e .
 ```
 
 ## Quick Start
 
 ```python
-from microtome import Microtome
+from segmenta import Segmenta
 
-microtome = Microtome(
+segmenta = Segmenta(
     openai_api_key="sk-...",
     model="gpt-4o",
 )
 
-result = microtome.chunk(
+result = segmenta.chunk(
     input_file="document.pdf",
     output_dir="./output",
 )
@@ -152,7 +152,7 @@ This repository uses a regression-style PDF designed to test topic separation wh
 
 PDF extraction commonly yields a small number of long paragraphs (even when the source document is conceptually separated). Without additional processing, that limits the maximum number of chunk boundaries.
 
-Microtome's `atomize` stage addresses this by splitting long paragraphs into smaller sentence groups before boundary detection.
+Segmenta's `atomize` stage addresses this by splitting long paragraphs into smaller sentence groups before boundary detection.
 
 ```text
 Distributed_12_Topic_Semantic_Document.pdf
@@ -165,7 +165,7 @@ Distributed_12_Topic_Semantic_Document.pdf
 
 Side-by-side visualization: the source PDF with chunk-colored overlays (left) and the corresponding chunks with matching colors (right).
 
-<img src="docs/images/chunking_visual_demo.png" width="1000" alt="Microtome chunking visualization: PDF highlights and chunk list" />
+<img src="docs/images/chunking_visual_demo.png" width="1000" alt="Segmenta chunking visualization: PDF highlights and chunk list" />
 
 ### Example Output: 14 Chunks
 
@@ -222,7 +222,7 @@ Below is an example chunk set produced from `Distributed_12_Topic_Semantic_Docum
 ### YAML Example
 
 ```yaml
-# microtome.yaml
+# segmenta.yaml
 chunking:
   similarity_threshold: 0.5
   atomize_sentences_per_paragraph: 2
@@ -244,13 +244,13 @@ llm:
 
 ## LLM Trace Logging (Prompt/Response Audit)
 
-When using the built-in OpenAI-compatible provider, Microtome writes a JSONL trace file in the output directory:
+When using the built-in OpenAI-compatible provider, Segmenta writes a JSONL trace file in the output directory:
 
-- `Microtome_llm_debug_<input_stem>_<utc_timestamp>.jsonl`
+- `Segmenta_llm_debug_<input_stem>_<utc_timestamp>.jsonl`
 
-If granularity planning is enabled, Microtome also writes a machine-readable plan:
+If granularity planning is enabled, Segmenta also writes a machine-readable plan:
 
-- `Microtome_granularity_plan_<input_stem>_<utc_timestamp>.json`
+- `Segmenta_granularity_plan_<input_stem>_<utc_timestamp>.json`
 
 Each `llm_call` record includes:
 
@@ -280,7 +280,7 @@ Security note: these logs can contain sensitive document content. Store and hand
 
 ## Metrics and Observability
 
-Each `chunk(...)` call returns a `MicrotomeResult` that includes:
+Each `chunk(...)` call returns a `SegmentaResult` that includes:
 
 - `chunks` and `output_path`
 - `warnings` / `errors`
@@ -294,7 +294,7 @@ Common metric keys:
 
 ## Security and Data Handling
 
-- Microtome processes documents locally for parsing and embedding generation (Sentence Transformers by default).
+- Segmenta processes documents locally for parsing and embedding generation (Sentence Transformers by default).
 - Chunk metadata enrichment and boundary validation send text to the configured LLM endpoint.
 - Trace logs write prompt/response content to disk; treat output directories as sensitive data stores.
 
@@ -302,20 +302,20 @@ Common metric keys:
 
 ```bash
 # Basic usage
-microtome document.pdf -o ./output --verbose
+segmenta document.pdf -o ./output --verbose
 
 # Dry run (no LLM calls)
-microtome document.md -o ./output --dry-run
+segmenta document.md -o ./output --dry-run
 ```
 
 ## Provider Interop (OpenAI-Compatible Endpoints)
 
-Microtome can be pointed at OpenAI-compatible gateways (example: Groq) by using `base_url`:
+Segmenta can be pointed at OpenAI-compatible gateways (example: Groq) by using `base_url`:
 
 ```python
 import os
-from microtome import Microtome, MicrotomeConfig
-from microtome.llm import OpenAIProvider
+from segmenta import Segmenta, SegmentaConfig
+from segmenta.llm import OpenAIProvider
 
 llm = OpenAIProvider(
     api_key=os.environ["GROQ_API_KEY"],
@@ -323,23 +323,23 @@ llm = OpenAIProvider(
     model="llama-3.3-70b-versatile",
 )
 
-microtome = (
-    Microtome.builder()
-    .with_config(MicrotomeConfig(verbose=True))
+segmenta = (
+    Segmenta.builder()
+    .with_config(SegmentaConfig(verbose=True))
     .with_llm_provider(llm)
     .build()
 )
 
-result = microtome.chunk("document.pdf", output_dir="./output")
+result = segmenta.chunk("document.pdf", output_dir="./output")
 ```
 
-## Extending Microtome
+## Extending Segmenta
 
 ### Custom Parser
 
 ```python
-from microtome.parsers.base import DocumentParser
-from microtome.parsers import ParserFactory
+from segmenta.parsers.base import DocumentParser
+from segmenta.parsers import ParserFactory
 
 class DocxParser(DocumentParser):
     def supported_extensions(self):
@@ -354,7 +354,7 @@ ParserFactory.register(".docx", DocxParser)
 ### Custom LLM Provider
 
 ```python
-from microtome.llm.base import LLMProvider, LLMResponse
+from segmenta.llm.base import LLMProvider, LLMResponse
 
 class CustomProvider(LLMProvider):
     @property

@@ -3,7 +3,7 @@
     "allow": [
       "Bash(tree:*)",
       "Bash(pip install:*)",
-      "Bash(python test_microtome.py:*)"
+      "Bash(python test_segmenta.py:*)"
     ]
   }
 }

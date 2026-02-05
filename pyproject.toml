@@ -1,12 +1,12 @@
 [project]
-name = "microtome"
+name = "segmenta"
 version = "1.0.0"
 description = "Semantic document chunking library"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.9"
 authors = [
-    {name = "Microtome Authors"}
+    {name = "Segmenta Authors"}
 ]
 keywords = ["chunking", "semantic", "document", "nlp", "rag", "llm"]
 classifiers = [
@@ -82,16 +82,16 @@ anthropic = [
 ]
 
 all = [
-    "microtome[dev,azure,anthropic]",
+    "segmenta[dev,azure,anthropic]",
 ]
 
 [project.scripts]
-microtome = "microtome.cli.main:cli"
+segmenta = "segmenta.cli.main:cli"
 
 [project.urls]
-Homepage = "https://github.com/microtome/microtome"
-Documentation = "https://microtome.readthedocs.io"
-Repository = "https://github.com/microtome/microtome"
+Homepage = "https://github.com/segmenta/segmenta"
+Documentation = "https://segmenta.readthedocs.io"
+Repository = "https://github.com/segmenta/segmenta"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
@@ -99,7 +99,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["microtome*"]
+include = ["segmenta*"]
 
 [tool.black]
 line-length = 100
@@ -123,4 +123,4 @@ disallow_untyped_defs = true
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
-addopts = "-v --cov=microtome --cov-report=term-missing"
+addopts = "-v --cov=segmenta --cov-report=term-missing"
