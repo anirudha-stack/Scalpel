@@ -1,0 +1,27 @@
+{
+  "topics": [
+    "Relocation Governance",
+    "Financial Planning",
+    "Cost Control Strategies",
+    "Vendor Management",
+    "Housing Assistance",
+    "Settling-in Services",
+    "Domestic Mobility Programs",
+    "International Mobility Programs",
+    "Compliance and Tax Treatment",
+    "Employee Responsibility",
+    "Change Management",
+    "Communication Strategy",
+    "Data Tracking and Reporting",
+    "Continuous Improvement"
+  ],
+  "expected_chunk_count": 12,
+  "expected_chunk_count_range": [
+    10,
+    14
+  ],
+  "atomize_sentences_per_paragraph": 3,
+  "atomize_min_sentences": 6,
+  "rationale": "The document covers a range of topics related to workforce mobility, with each paragraph introducing new subtopics. Atomizing paragraphs into smaller groups of sentences will help expose semantic boundaries and improve topic purity. (Adjusted atomization to avoid under-splitting: 3 sentences/group, min_sentences=6.)",
+  "confidence": 0.8
+}

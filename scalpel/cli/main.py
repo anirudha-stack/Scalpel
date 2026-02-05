@@ -72,6 +72,11 @@ def setup_logging(verbose: bool) -> None:
     help="Maximum tokens per chunk",
 )
 @click.option(
+    "--plan-granularity/--no-plan-granularity",
+    default=True,
+    help="Use an initial LLM pass to plan atomizer granularity (recommended for PDFs).",
+)
+@click.option(
     "-v",
     "--verbose",
     is_flag=True,
@@ -92,6 +97,7 @@ def cli(
     threshold: float,
     min_tokens: int,
     max_tokens: int,
+    plan_granularity: bool,
     verbose: bool,
     dry_run: bool,
 ) -> None:
@@ -120,6 +126,7 @@ def cli(
                 similarity_threshold=threshold,
                 min_chunk_tokens=min_tokens,
                 max_chunk_tokens=max_tokens,
+                granularity_planning_enabled=plan_granularity,
                 verbose=verbose,
             )
     except ScalpelError as e:

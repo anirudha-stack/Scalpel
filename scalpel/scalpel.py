@@ -1,6 +1,7 @@
 """Main Scalpel class - entry point for the library."""
 
 from datetime import datetime, timezone
+import json
 import logging
 from pathlib import Path
 from typing import Optional, Callable, List
@@ -20,6 +21,7 @@ from scalpel.pipeline.orchestrator import PipelineOrchestrator
 from scalpel.pipeline.stages import (
     ParseStage,
     SegmentStage,
+    GranularityStage,
     AtomizeStage,
     BoundaryDetectStage,
     BoundaryValidateStage,
@@ -141,6 +143,7 @@ class Scalpel:
         stages = [
             ParseStage(),
             SegmentStage(),
+            GranularityStage(llm_provider=self._llm_provider),
             AtomizeStage(),
             BoundaryDetectStage(
                 embedding_provider=self._embedding_provider,
@@ -172,6 +175,19 @@ class Scalpel:
             output_dir=output_dir,
             dry_run=dry_run,
         )
+
+        # Write granularity plan (if generated) to output_dir for auditability.
+        plan = context.metrics.get("granularity_plan")
+        if isinstance(plan, dict):
+            plan_path = output_path / f"Scalpel_granularity_plan_{run_id}.json"
+            try:
+                plan_path.write_text(
+                    json.dumps(plan, indent=2, ensure_ascii=True) + "\n",
+                    encoding="utf-8",
+                )
+                context.add_metric("granularity_plan_path", str(plan_path))
+            except Exception as e:
+                context.add_warning(f"Failed to write granularity plan file: {e}")
 
         # Build result
         return ScalpelResult(

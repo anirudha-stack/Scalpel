@@ -28,6 +28,9 @@ class AtomizeStage(PipelineStage):
         return "atomize"
 
     def should_skip(self, context: PipelineContext) -> bool:
+        planned = context.atomize_sentences_per_paragraph_override
+        if planned is not None:
+            return planned <= 0
         return context.config.atomize_sentences_per_paragraph <= 0
 
     def process(self, context: PipelineContext) -> PipelineContext:
@@ -38,8 +41,27 @@ class AtomizeStage(PipelineStage):
             context.add_metric("atomize_time", time.time() - start_time)
             return context
 
-        group_size = context.config.atomize_sentences_per_paragraph
-        min_sentences = context.config.atomize_min_sentences
+        group_size = (
+            context.atomize_sentences_per_paragraph_override
+            if context.atomize_sentences_per_paragraph_override is not None
+            else context.config.atomize_sentences_per_paragraph
+        )
+        min_sentences = (
+            context.atomize_min_sentences_override
+            if context.atomize_min_sentences_override is not None
+            else context.config.atomize_min_sentences
+        )
+
+        if group_size <= 0:
+            # Planning stage may disable atomization; still record metrics.
+            context.add_metric("atomize_time", time.time() - start_time)
+            context.add_metric("paragraphs_before_atomize", len(paragraphs))
+            context.add_metric("paragraphs_after_atomize", len(paragraphs))
+            context.add_metric("paragraphs_atomized", 0)
+            context.add_metric("atoms_total", len(paragraphs))
+            context.add_metric("atomize_sentences_per_paragraph", group_size)
+            context.add_metric("atomize_min_sentences", min_sentences)
+            return context
 
         before_count = len(paragraphs)
         after: List[Paragraph] = []
@@ -154,4 +176,3 @@ class AtomizeStage(PipelineStage):
             )
 
         return context
-

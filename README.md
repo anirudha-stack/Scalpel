@@ -57,7 +57,8 @@ print("output:", result.output_path)
 flowchart LR
   A["Input: PDF / MD / TXT"] --> B["Parse"]
   B --> C["Segment: paragraphs"]
-  C --> D["Atomize (optional): sentence groups"]
+  C --> P["Plan granularity (LLM)"]
+  P --> D["Atomize (adaptive): sentence groups"]
   D --> E["Embedding similarity"]
   E --> F["Propose boundaries"]
   F --> G["LLM validates boundaries"]
@@ -77,7 +78,9 @@ sequenceDiagram
 
   D->>P: parse(input)
   P->>P: segment(paragraphs)
-  P->>P: atomize (optional)
+  P->>L: plan granularity (topics, expected chunks)
+  L-->>P: plan (JSON)
+  P->>P: atomize (adaptive)
   P->>E: embed(text units)
   E-->>P: adjacent similarities
   P->>L: validate(boundary candidates)
@@ -95,22 +98,27 @@ sequenceDiagram
    - Produces a `Document` with sections, paragraphs, and raw text.
 2. Segment
    - Extracts ordered `Paragraph` items in document order.
-3. Atomize (optional)
-   - Splits long paragraphs into smaller sentence groups before boundary detection.
+3. Granularity plan (LLM)
+   - Sends a compact sample of the document to the LLM to estimate:
+     - topics covered
+     - expected chunk count for retrieval
+     - recommended atomization settings
+4. Atomize (adaptive)
+   - Splits long paragraphs into smaller sentence groups before boundary detection based on the plan.
    - This is especially important for PDFs where extraction often collapses multiple ideas into a single "paragraph."
-4. Boundary detect (embeddings)
+5. Boundary detect (embeddings)
    - Computes semantic similarity between adjacent paragraph/atom embeddings.
    - Proposes boundaries where similarity drops below `similarity_threshold`.
-5. Boundary validate (LLM)
+6. Boundary validate (LLM)
    - Validates each proposed boundary for retrieval quality:
      - `KEEP` (split is correct)
      - `MERGE` (should be continuous)
      - `ADJUST` (boundary should move nearby)
-6. Chunk form
+7. Chunk form
    - Groups paragraphs/atoms into chunks using final boundaries.
-7. Enrich (LLM)
+8. Enrich (LLM)
    - Extracts structured metadata per chunk.
-8. Output
+9. Output
    - Writes chunked Markdown and provider-supported JSONL debug traces.
 
 ## Output Format
@@ -195,6 +203,12 @@ Below is an example chunk set produced from `Distributed_12_Topic_Semantic_Docum
   - If > 0, long paragraphs can be split into sentence groups before boundary detection.
 - `atomize_min_sentences`
   - Only atomize paragraphs that meet or exceed this sentence count.
+- `granularity_planning_enabled`
+  - If true, an initial LLM pass estimates expected chunk count and sets atomization parameters.
+- `granularity_max_paragraphs`
+  - Limits how many paragraphs are sampled and sent to the planner.
+- `granularity_max_chars_per_paragraph`
+  - Limits how much text per paragraph is included in the planner prompt.
 
 ### YAML Example
 
@@ -204,6 +218,9 @@ chunking:
   similarity_threshold: 0.5
   atomize_sentences_per_paragraph: 2
   atomize_min_sentences: 6
+  granularity_planning_enabled: true
+  granularity_max_paragraphs: 60
+  granularity_max_chars_per_paragraph: 280
 
 behavior:
   retry_attempts: 2
@@ -221,6 +238,10 @@ llm:
 When using the built-in OpenAI-compatible provider, Scalpel writes a JSONL trace file in the output directory:
 
 - `Scalpel_llm_debug_<input_stem>_<utc_timestamp>.jsonl`
+
+If granularity planning is enabled, Scalpel also writes a machine-readable plan:
+
+- `Scalpel_granularity_plan_<input_stem>_<utc_timestamp>.json`
 
 Each `llm_call` record includes:
 

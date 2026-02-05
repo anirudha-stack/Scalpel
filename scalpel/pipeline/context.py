@@ -35,6 +35,10 @@ class PipelineContext:
     skip_boundary_detection: bool = False  # For short documents
     dry_run: bool = False  # Skip LLM calls
 
+    # Adaptive settings (populated by planning stages)
+    atomize_sentences_per_paragraph_override: Optional[int] = None
+    atomize_min_sentences_override: Optional[int] = None
+
     # Metrics
     metrics: Dict[str, Any] = field(default_factory=dict)
 

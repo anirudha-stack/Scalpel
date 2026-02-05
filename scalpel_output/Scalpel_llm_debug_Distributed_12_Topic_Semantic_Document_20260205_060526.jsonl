@@ -1,0 +1,1 @@
+{"type": "run_start", "run_id": "Distributed_12_Topic_Semantic_Document_20260205_060526", "timestamp": "2026-02-05T06:05:26.462977+00:00", "input_path": "..\\Distributed_12_Topic_Semantic_Document.pdf", "model": "llama-3.3-70b-versatile", "log_path": "scalpel_output\\Scalpel_llm_debug_Distributed_12_Topic_Semantic_Document_20260205_060526.jsonl"}

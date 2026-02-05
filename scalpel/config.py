@@ -75,6 +75,15 @@ class ScalpelConfig:
     atomize_min_sentences: int = 6
     """Only atomize paragraphs that have at least this many sentences."""
 
+    granularity_planning_enabled: bool = True
+    """If True, run an initial LLM pass to plan atomization granularity."""
+
+    granularity_max_paragraphs: int = 60
+    """Maximum number of paragraphs to include in the granularity planning sample."""
+
+    granularity_max_chars_per_paragraph: int = 280
+    """Maximum characters per paragraph included in the granularity planning sample."""
+
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         self._validate()
@@ -123,6 +132,18 @@ class ScalpelConfig:
                 "atomize_min_sentences",
             )
 
+        if self.granularity_max_paragraphs < 1:
+            raise ScalpelConfigError(
+                f"granularity_max_paragraphs must be >= 1, got {self.granularity_max_paragraphs}",
+                "granularity_max_paragraphs",
+            )
+
+        if self.granularity_max_chars_per_paragraph < 1:
+            raise ScalpelConfigError(
+                f"granularity_max_chars_per_paragraph must be >= 1, got {self.granularity_max_chars_per_paragraph}",
+                "granularity_max_chars_per_paragraph",
+            )
+
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "ScalpelConfig":
         """Create configuration from dictionary."""
@@ -142,6 +163,15 @@ class ScalpelConfig:
             )
             flat_data["atomize_min_sentences"] = chunking.get(
                 "atomize_min_sentences", 6
+            )
+            flat_data["granularity_planning_enabled"] = chunking.get(
+                "granularity_planning_enabled", True
+            )
+            flat_data["granularity_max_paragraphs"] = chunking.get(
+                "granularity_max_paragraphs", 60
+            )
+            flat_data["granularity_max_chars_per_paragraph"] = chunking.get(
+                "granularity_max_chars_per_paragraph", 280
             )
 
         if "behavior" in data:
@@ -180,6 +210,9 @@ class ScalpelConfig:
             "llm_max_tokens",
             "atomize_sentences_per_paragraph",
             "atomize_min_sentences",
+            "granularity_planning_enabled",
+            "granularity_max_paragraphs",
+            "granularity_max_chars_per_paragraph",
         ]:
             if key in data and key not in flat_data:
                 flat_data[key] = data[key]
@@ -239,4 +272,7 @@ class ScalpelConfig:
             "llm_max_tokens": self.llm_max_tokens,
             "atomize_sentences_per_paragraph": self.atomize_sentences_per_paragraph,
             "atomize_min_sentences": self.atomize_min_sentences,
+            "granularity_planning_enabled": self.granularity_planning_enabled,
+            "granularity_max_paragraphs": self.granularity_max_paragraphs,
+            "granularity_max_chars_per_paragraph": self.granularity_max_chars_per_paragraph,
         }
