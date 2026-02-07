@@ -78,11 +78,17 @@ class SegmentaConfig:
     granularity_planning_enabled: bool = True
     """If True, run an initial LLM pass to plan atomization granularity."""
 
+    granularity_critique_enabled: bool = True
+    """If True, run a second LLM critique pass to validate the granularity plan before applying it."""
+
     granularity_max_paragraphs: int = 60
     """Maximum number of paragraphs to include in the granularity planning sample."""
 
     granularity_max_chars_per_paragraph: int = 280
     """Maximum characters per paragraph included in the granularity planning sample."""
+
+    boundary_validation_critique_enabled: bool = True
+    """If True, run a binary critique veto after boundary validation to reduce hallucinated splits."""
 
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
@@ -167,11 +173,17 @@ class SegmentaConfig:
             flat_data["granularity_planning_enabled"] = chunking.get(
                 "granularity_planning_enabled", True
             )
+            flat_data["granularity_critique_enabled"] = chunking.get(
+                "granularity_critique_enabled", True
+            )
             flat_data["granularity_max_paragraphs"] = chunking.get(
                 "granularity_max_paragraphs", 60
             )
             flat_data["granularity_max_chars_per_paragraph"] = chunking.get(
                 "granularity_max_chars_per_paragraph", 280
+            )
+            flat_data["boundary_validation_critique_enabled"] = chunking.get(
+                "boundary_validation_critique_enabled", True
             )
 
         if "behavior" in data:
@@ -211,8 +223,10 @@ class SegmentaConfig:
             "atomize_sentences_per_paragraph",
             "atomize_min_sentences",
             "granularity_planning_enabled",
+            "granularity_critique_enabled",
             "granularity_max_paragraphs",
             "granularity_max_chars_per_paragraph",
+            "boundary_validation_critique_enabled",
         ]:
             if key in data and key not in flat_data:
                 flat_data[key] = data[key]
@@ -273,6 +287,8 @@ class SegmentaConfig:
             "atomize_sentences_per_paragraph": self.atomize_sentences_per_paragraph,
             "atomize_min_sentences": self.atomize_min_sentences,
             "granularity_planning_enabled": self.granularity_planning_enabled,
+            "granularity_critique_enabled": self.granularity_critique_enabled,
             "granularity_max_paragraphs": self.granularity_max_paragraphs,
             "granularity_max_chars_per_paragraph": self.granularity_max_chars_per_paragraph,
+            "boundary_validation_critique_enabled": self.boundary_validation_critique_enabled,
         }

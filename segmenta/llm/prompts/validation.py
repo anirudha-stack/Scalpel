@@ -1,5 +1,9 @@
 """Prompt templates for boundary validation."""
 
+from __future__ import annotations
+
+from typing import Optional
+
 BOUNDARY_VALIDATION_SYSTEM = """You are an expert at semantic chunking for retrieval (RAG).
 Your task is to decide whether a proposed boundary between two adjacent text segments should be a chunk split.
 
@@ -21,7 +25,7 @@ You must respond with valid JSON only, no additional text."""
 BOUNDARY_VALIDATION_TEMPLATE = """Below is a proposed chunk boundary in a document.
 Analyze whether these segments should be separate chunks for retrieval.
 
-END OF CURRENT CHUNK:
+{context_block}END OF CURRENT CHUNK:
 \"\"\"
 {text_before}
 \"\"\"
@@ -46,17 +50,62 @@ Rules:
 Respond with JSON only."""
 
 
-def format_validation_prompt(text_before: str, text_after: str) -> str:
+BOUNDARY_CRITIQUE_SYSTEM = """You are a strict boundary critic for retrieval chunking.
+
+You must output exactly one token: YES or NO (uppercase), and nothing else.
+
+Interpret the question as: "Is there a real discourse break here such that a boundary should exist?"
+- YES: keep the boundary (split here)
+- NO: veto the boundary (do not split here)
+
+No explanations. No rewriting. No restructuring."""
+
+BOUNDARY_CRITIQUE_TEMPLATE = """{context_block}END OF CURRENT CHUNK:
+\"\"\"
+{text_before}
+\"\"\"
+
+START OF PROPOSED NEW CHUNK:
+\"\"\"
+{text_after}
+\"\"\"
+
+Question (answer YES or NO only):
+Does inserting a boundary here break narrative continuity, reference resolution, or discourse intent?"""
+
+
+def format_validation_prompt(
+    text_before: str,
+    text_after: str,
+    *,
+    context_block: Optional[str] = None,
+) -> str:
     """Format the validation prompt with the given text segments.
 
     Args:
         text_before: Text at the end of the current chunk
         text_after: Text at the start of the proposed new chunk
+        context_block: Optional context block (should include trailing blank line)
 
     Returns:
         Formatted prompt string
     """
     return BOUNDARY_VALIDATION_TEMPLATE.format(
+        context_block=context_block or "",
+        text_before=text_before,
+        text_after=text_after,
+    )
+
+
+def format_boundary_critique_prompt(
+    text_before: str,
+    text_after: str,
+    *,
+    context_block: Optional[str] = None,
+) -> str:
+    """Format the boundary critique prompt with the given text segments."""
+    return BOUNDARY_CRITIQUE_TEMPLATE.format(
+        context_block=context_block or "",
         text_before=text_before,
         text_after=text_after,
     )

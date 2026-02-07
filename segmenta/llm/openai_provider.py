@@ -5,12 +5,62 @@ import re
 from typing import Optional, Dict, Any
 
 from segmenta.llm.base import LLMProvider, LLMResponse
+from segmenta.llm.prompts.enrichment import ENRICHMENT_SYSTEM
+from segmenta.llm.prompts.granularity import (
+    GRANULARITY_CRITIQUE_SYSTEM,
+    GRANULARITY_SYSTEM,
+)
+from segmenta.llm.prompts.validation import (
+    BOUNDARY_CRITIQUE_SYSTEM,
+    BOUNDARY_VALIDATION_SYSTEM,
+)
 from segmenta.exceptions import SegmentaLLMError
 from segmenta.utils.llm_debug_logger import LLMDebugLogger
 
 
 class OpenAIProvider(LLMProvider):
     """LLM provider using OpenAI API."""
+
+    @staticmethod
+    def _infer_debug_tags(system_prompt: Optional[str]) -> Optional[Dict[str, Any]]:
+        """Infer call tags for debugging/audit logs."""
+        if not system_prompt:
+            return None
+
+        if system_prompt == GRANULARITY_SYSTEM:
+            return {
+                "pipeline_stage": "granularity",
+                "call_role": "worker",
+                "call_kind": "granularity_plan_worker",
+            }
+        if system_prompt == GRANULARITY_CRITIQUE_SYSTEM:
+            return {
+                "pipeline_stage": "granularity",
+                "call_role": "critique",
+                "call_kind": "granularity_plan_critique",
+            }
+
+        if system_prompt == BOUNDARY_VALIDATION_SYSTEM:
+            return {
+                "pipeline_stage": "boundary_validate",
+                "call_role": "worker",
+                "call_kind": "boundary_validate_worker",
+            }
+        if system_prompt == BOUNDARY_CRITIQUE_SYSTEM:
+            return {
+                "pipeline_stage": "boundary_validate",
+                "call_role": "critique",
+                "call_kind": "boundary_validate_critique",
+            }
+
+        if system_prompt == ENRICHMENT_SYSTEM:
+            return {
+                "pipeline_stage": "enrich",
+                "call_role": "worker",
+                "call_kind": "enrich_worker",
+            }
+
+        return None
 
     def __init__(
         self,
@@ -76,12 +126,14 @@ class OpenAIProvider(LLMProvider):
             content = response.choices[0].message.content or ""
             tokens_used = response.usage.total_tokens if response.usage else 0
             if self._debug_logger:
+                extra = self._infer_debug_tags(system_prompt)
                 self._debug_logger.log_call(
                     prompt=prompt,
                     system_prompt=system_prompt,
                     response_content=content,
                     tokens_used=tokens_used,
                     success=True,
+                    extra=extra,
                 )
 
             return LLMResponse(
@@ -93,6 +145,7 @@ class OpenAIProvider(LLMProvider):
 
         except Exception as e:
             if self._debug_logger:
+                extra = self._infer_debug_tags(system_prompt)
                 self._debug_logger.log_call(
                     prompt=prompt,
                     system_prompt=system_prompt,
@@ -100,6 +153,7 @@ class OpenAIProvider(LLMProvider):
                     tokens_used=0,
                     success=False,
                     error=str(e),
+                    extra=extra,
                 )
             return LLMResponse(
                 content="",

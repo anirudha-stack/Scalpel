@@ -2,13 +2,16 @@
 
 import time
 import logging
+import re
 from typing import Optional
 
 from segmenta.pipeline.base import PipelineStage
 from segmenta.pipeline.context import PipelineContext
 from segmenta.llm.base import LLMProvider
 from segmenta.llm.prompts.validation import (
+    BOUNDARY_CRITIQUE_SYSTEM,
     BOUNDARY_VALIDATION_SYSTEM,
+    format_boundary_critique_prompt,
     format_validation_prompt,
 )
 from segmenta.models import BoundaryDecision, BoundaryVerdict
@@ -55,11 +58,17 @@ class BoundaryValidateStage(PipelineStage):
             Updated context with boundary decisions
         """
         start_time = time.time()
-        llm_tokens_used = 0
+        critique_enabled = bool(
+            getattr(context.config, "boundary_validation_critique_enabled", True)
+        )
+        context.add_metric("boundary_critique_enabled", critique_enabled)
+        context.add_metric("boundary_critique_calls", 0)
+        context.add_metric("boundary_critique_vetoes", 0)
+        context.add_metric("boundary_critique_failed", 0)
 
         for proposal in context.boundary_proposals:
             try:
-                decision = self._validate_boundary(proposal)
+                decision = self._validate_boundary(proposal, context, critique_enabled)
                 context.boundary_decisions.append(decision)
 
             except SegmentaLLMError as e:
@@ -89,18 +98,27 @@ class BoundaryValidateStage(PipelineStage):
 
         return context
 
-    def _validate_boundary(self, proposal) -> BoundaryDecision:
+    def _validate_boundary(
+        self,
+        proposal,
+        context: PipelineContext,
+        critique_enabled: bool,
+    ) -> BoundaryDecision:
         """Validate a single boundary proposal.
 
         Args:
             proposal: Boundary proposal to validate
+            context: Pipeline context (for configuration and metrics)
+            critique_enabled: Whether the binary critique gate is enabled
 
         Returns:
             BoundaryDecision with the LLM verdict
         """
+        ctx_block = self._build_context_block(proposal, context)
         prompt = format_validation_prompt(
             text_before=proposal.get_text_before(max_chars=500),
             text_after=proposal.get_text_after(max_chars=500),
+            context_block=ctx_block,
         )
 
         if self._retry:
@@ -118,9 +136,79 @@ class BoundaryValidateStage(PipelineStage):
         reason = result.get("reason", "")
         confidence = float(result.get("confidence", 1.0))
 
+        # Binary critique veto: only runs when the worker would keep/split.
+        if critique_enabled and verdict != BoundaryVerdict.MERGE:
+            context.increment_metric("boundary_critique_calls", 1)
+            critique_prompt = format_boundary_critique_prompt(
+                text_before=proposal.get_text_before(max_chars=500),
+                text_after=proposal.get_text_after(max_chars=500),
+                context_block=ctx_block,
+            )
+            try:
+                critique_resp = self._llm.complete(
+                    critique_prompt, BOUNDARY_CRITIQUE_SYSTEM
+                )
+                if critique_resp.failed:
+                    context.increment_metric("boundary_critique_failed", 1)
+                else:
+                    vote = self._parse_yes_no(critique_resp.content)
+                    if vote == "NO":
+                        context.increment_metric("boundary_critique_vetoes", 1)
+                        verdict = BoundaryVerdict.MERGE
+                        # Preserve worker output for auditing.
+                        reason = (
+                            "Critique vetoed boundary (NO). "
+                            f"Worker verdict={verdict_str!r}. Worker reason={reason!r}"
+                        )
+                        confidence = min(confidence, 0.5)
+            except Exception as e:
+                # Never fail the stage due to critique issues; fall back to worker verdict.
+                context.increment_metric("boundary_critique_failed", 1)
+                context.add_warning(f"Boundary critique error: {e}. Using worker verdict.")
+
         return BoundaryDecision(
             proposal=proposal,
             verdict=verdict,
             reason=reason,
             confidence=confidence,
         )
+
+    @staticmethod
+    def _build_context_block(proposal, context: PipelineContext) -> str:
+        """Build optional global context for both worker and critique prompts."""
+        lines = [
+            "Context:",
+            f"- similarity_score: {getattr(proposal, 'similarity_score', 0.0):.3f}",
+            f"- min_chunk_tokens: {context.config.min_chunk_tokens}",
+            f"- max_chunk_tokens: {context.config.max_chunk_tokens}",
+        ]
+
+        plan = context.metrics.get("granularity_plan")
+        if isinstance(plan, dict):
+            topics = plan.get("topics")
+            if isinstance(topics, list):
+                topics_clean = [
+                    t.strip()
+                    for t in topics
+                    if isinstance(t, str) and t.strip()
+                ][:12]
+                if topics_clean:
+                    joined = ", ".join(topics_clean)
+                    lines.append(f"- document_topics (approx): {joined}")
+
+        return "\n".join(lines) + "\n\n"
+
+    _YES_NO_RE = re.compile(r"\b(YES|NO)\b", re.IGNORECASE)
+
+    @classmethod
+    def _parse_yes_no(cls, text: str) -> str:
+        """Parse a strict YES/NO vote from an LLM response."""
+        if not isinstance(text, str):
+            return ""
+        stripped = text.strip().upper()
+        if stripped in {"YES", "NO"}:
+            return stripped
+        match = cls._YES_NO_RE.search(text)
+        if match:
+            return match.group(1).upper()
+        return ""

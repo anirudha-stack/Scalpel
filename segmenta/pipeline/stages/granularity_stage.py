@@ -21,7 +21,9 @@ from segmenta.pipeline.base import PipelineStage
 from segmenta.pipeline.context import PipelineContext
 from segmenta.llm.base import LLMProvider
 from segmenta.llm.prompts.granularity import (
+    GRANULARITY_CRITIQUE_SYSTEM,
     GRANULARITY_SYSTEM,
+    format_granularity_critique_prompt,
     format_granularity_prompt,
 )
 from segmenta.exceptions import SegmentaLLMError
@@ -56,11 +58,12 @@ class GranularityStage(PipelineStage):
 
         try:
             paragraph_lines = self._build_paragraph_lines(context)
+            section_titles = self._format_section_titles(context)
             prompt = format_granularity_prompt(
                 file_type=context.document.file_type,
                 paragraph_count=context.paragraph_count,
                 section_count=len(context.document.sections),
-                section_titles=self._format_section_titles(context),
+                section_titles=section_titles,
                 min_chunk_tokens=context.config.min_chunk_tokens,
                 max_chunk_tokens=context.config.max_chunk_tokens,
                 similarity_threshold=context.config.similarity_threshold,
@@ -75,13 +78,61 @@ class GranularityStage(PipelineStage):
             context.add_metric("granularity_plan", plan)
             context.add_metric("granularity_planning_skipped", False)
 
-            # Apply overrides for the atomizer.
-            context.atomize_sentences_per_paragraph_override = plan.get(
-                "atomize_sentences_per_paragraph"
+            critique_enabled = bool(
+                getattr(context.config, "granularity_critique_enabled", True)
             )
-            context.atomize_min_sentences_override = plan.get(
-                "atomize_min_sentences"
-            )
+            context.add_metric("granularity_critique_enabled", critique_enabled)
+
+            critique_verdict = "ACCEPT"
+            critique: Optional[Dict[str, Any]] = None
+            if critique_enabled:
+                critique_prompt = format_granularity_critique_prompt(
+                    file_type=context.document.file_type,
+                    paragraph_count=context.paragraph_count,
+                    section_count=len(context.document.sections),
+                    section_titles=section_titles,
+                    min_chunk_tokens=context.config.min_chunk_tokens,
+                    max_chunk_tokens=context.config.max_chunk_tokens,
+                    similarity_threshold=context.config.similarity_threshold,
+                    paragraph_lines=paragraph_lines,
+                    plan=plan,
+                )
+                try:
+                    critique_raw = self._llm.complete_json(
+                        critique_prompt, GRANULARITY_CRITIQUE_SYSTEM
+                    )
+                    critique = self._normalize_critique(critique_raw)
+                    critique_verdict = critique.get("verdict", "ACCEPT")
+                except SegmentaLLMError as e:
+                    context.add_warning(
+                        f"Granularity critique failed: {e}. Applying worker plan."
+                    )
+                    context.add_metric("granularity_critique_failed", True)
+                except Exception as e:
+                    context.add_warning(
+                        f"Granularity critique error: {e}. Applying worker plan."
+                    )
+                    context.add_metric("granularity_critique_failed", True)
+
+            if critique is not None:
+                context.add_metric("granularity_critique", critique)
+            context.add_metric("granularity_critique_verdict", critique_verdict)
+
+            apply_plan = critique_verdict != "REJECT"
+            context.add_metric("granularity_plan_applied", apply_plan)
+
+            if apply_plan:
+                # Apply overrides for the atomizer.
+                context.atomize_sentences_per_paragraph_override = plan.get(
+                    "atomize_sentences_per_paragraph"
+                )
+                context.atomize_min_sentences_override = plan.get(
+                    "atomize_min_sentences"
+                )
+            else:
+                context.add_warning(
+                    "Granularity critique rejected the worker plan; using configured atomization defaults."
+                )
 
         except SegmentaLLMError as e:
             context.add_warning(
@@ -97,6 +148,42 @@ class GranularityStage(PipelineStage):
 
         context.add_metric("granularity_time", time.time() - start_time)
         return context
+
+    @staticmethod
+    def _normalize_critique(raw: Dict[str, Any]) -> Dict[str, Any]:
+        verdict = raw.get("verdict", "ACCEPT")
+        if not isinstance(verdict, str):
+            verdict = "ACCEPT"
+        verdict = verdict.strip().upper()
+        if verdict not in {"ACCEPT", "REJECT"}:
+            verdict = "ACCEPT"
+
+        issues = raw.get("issues", [])
+        if isinstance(issues, str):
+            issues = [issues]
+        if not isinstance(issues, list):
+            issues = []
+        issues_out: List[str] = []
+        for item in issues:
+            if not isinstance(item, str):
+                continue
+            msg = item.strip()
+            if msg:
+                issues_out.append(msg[:200])
+        issues_out = issues_out[:20]
+
+        confidence = raw.get("confidence", 0.0)
+        try:
+            confidence_f = float(confidence)
+        except Exception:
+            confidence_f = 0.0
+        confidence_f = max(0.0, min(1.0, confidence_f))
+
+        return {
+            "verdict": verdict,
+            "issues": issues_out,
+            "confidence": confidence_f,
+        }
 
     def _apply_safety_adjustments(
         self, plan: Dict[str, Any], context: PipelineContext

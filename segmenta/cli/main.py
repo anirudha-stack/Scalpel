@@ -77,6 +77,16 @@ def setup_logging(verbose: bool) -> None:
     help="Use an initial LLM pass to plan atomizer granularity (recommended for PDFs).",
 )
 @click.option(
+    "--critique-granularity/--no-critique-granularity",
+    default=True,
+    help="Run a second LLM critique pass to validate the granularity plan before applying it.",
+)
+@click.option(
+    "--critique-boundaries/--no-critique-boundaries",
+    default=True,
+    help="Run a binary YES/NO critique veto after boundary validation (recommended).",
+)
+@click.option(
     "-v",
     "--verbose",
     is_flag=True,
@@ -98,6 +108,8 @@ def cli(
     min_tokens: int,
     max_tokens: int,
     plan_granularity: bool,
+    critique_granularity: bool,
+    critique_boundaries: bool,
     verbose: bool,
     dry_run: bool,
 ) -> None:
@@ -127,6 +139,8 @@ def cli(
                 min_chunk_tokens=min_tokens,
                 max_chunk_tokens=max_tokens,
                 granularity_planning_enabled=plan_granularity,
+                granularity_critique_enabled=critique_granularity,
+                boundary_validation_critique_enabled=critique_boundaries,
                 verbose=verbose,
             )
     except SegmentaError as e:

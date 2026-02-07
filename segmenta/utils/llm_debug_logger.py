@@ -57,6 +57,9 @@ class LLMDebugLogger:
         }
         if extra:
             event["extra"] = extra
+            for key in ("pipeline_stage", "call_role", "call_kind"):
+                if key in extra:
+                    event[key] = extra[key]
         self._write_event(event)
 
     def _write_event(self, event: Dict[str, Any]) -> None:

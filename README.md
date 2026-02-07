@@ -57,12 +57,14 @@ print("output:", result.output_path)
 flowchart LR
   A["Input: PDF / MD / TXT"] --> B["Parse"]
   B --> C["Segment: paragraphs"]
-  C --> P["Plan granularity (LLM)"]
-  P --> D["Atomize (adaptive): sentence groups"]
+  C --> P["Plan granularity (LLM worker)"]
+  P --> PC["Critique granularity plan (LLM)"]
+  PC --> D["Atomize (adaptive): sentence groups"]
   D --> E["Embedding similarity"]
   E --> F["Propose boundaries"]
-  F --> G["LLM validates boundaries"]
-  G --> H["Form chunks"]
+  F --> G["Validate boundaries (LLM worker)"]
+  G --> GC["Critique boundaries (LLM YES/NO veto)"]
+  GC --> H["Form chunks"]
   H --> I["LLM enriches metadata"]
   I --> J["Write output: Markdown + YAML frontmatter"]
   I --> K["Write trace: JSONL prompt/response log (provider-supported)"]
@@ -78,13 +80,17 @@ sequenceDiagram
 
   D->>P: parse(input)
   P->>P: segment(paragraphs)
-  P->>L: plan granularity (topics, expected chunks)
+  P->>L: plan granularity (worker)
   L-->>P: plan (JSON)
+  P->>L: critique granularity plan
+  L-->>P: ACCEPT/REJECT (JSON)
   P->>P: atomize (adaptive)
   P->>E: embed(text units)
   E-->>P: adjacent similarities
-  P->>L: validate(boundary candidates)
+  P->>L: validate(boundary candidates) (worker)
   L-->>P: KEEP/MERGE/ADJUST
+  P->>L: critique boundary (YES/NO veto)
+  L-->>P: YES/NO
   P->>P: form chunks
   P->>L: enrich(metadata per chunk)
   L-->>P: title/summary/keywords/intent
@@ -103,6 +109,7 @@ sequenceDiagram
      - topics covered
      - expected chunk count for retrieval
      - recommended atomization settings
+   - Then runs a critique pass that can ACCEPT/REJECT applying the plan.
 4. Atomize (adaptive)
    - Splits long paragraphs into smaller sentence groups before boundary detection based on the plan.
    - This is especially important for PDFs where extraction often collapses multiple ideas into a single "paragraph."
@@ -114,6 +121,7 @@ sequenceDiagram
      - `KEEP` (split is correct)
      - `MERGE` (should be continuous)
      - `ADJUST` (boundary should move nearby)
+   - Then runs a critique veto that outputs only `YES`/`NO` (keep/remove boundary).
 7. Chunk form
    - Groups paragraphs/atoms into chunks using final boundaries.
 8. Enrich (LLM)
@@ -228,8 +236,10 @@ chunking:
   atomize_sentences_per_paragraph: 2
   atomize_min_sentences: 6
   granularity_planning_enabled: true
+  granularity_critique_enabled: true
   granularity_max_paragraphs: 60
   granularity_max_chars_per_paragraph: 280
+  boundary_validation_critique_enabled: true
 
 behavior:
   retry_attempts: 2
@@ -267,6 +277,9 @@ Example record:
   "type": "llm_call",
   "run_id": "MyDoc_20260205_001122",
   "timestamp": "2026-02-05T00:11:22.000000+00:00",
+  "pipeline_stage": "boundary_validate",
+  "call_role": "worker",
+  "call_kind": "boundary_validate_worker",
   "prompt": "...",
   "system_prompt": "...",
   "response": "...",
