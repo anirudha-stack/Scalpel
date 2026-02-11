@@ -4,6 +4,10 @@ Semantic document chunking for retrieval (RAG), search, and downstream analytics
 
 Segmenta transforms unstructured documents (PDF, Markdown, plain text) into semantically isolated chunks enriched with structured metadata. It is built as a composable pipeline with pluggable embedding + LLM providers and enterprise-friendly observability (including prompt/response traces when supported by the provider).
 
+<p align="center">
+  <img src="docs/images/segmenta_pipeline_overview.png" width="1000" alt="Segmenta pipeline overview (local stages + LLM callouts)" />
+</p>
+
 ## What You Get
 
 - Retrieval-first chunk boundaries (topic purity over broad grouping)
@@ -52,6 +56,10 @@ print("output:", result.output_path)
 ```
 
 ## How Chunking Works (Step-by-Step)
+
+<p align="center">
+  <img src="docs/images/segmenta_chunking_demo.gif" width="700" alt="Segmenta chunking demo animation: sentence groups to semantic chunks" />
+</p>
 
 ```mermaid
 flowchart LR
