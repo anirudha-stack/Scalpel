@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow6" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="480" rx="16" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-size="22" font-weight="700" fill="#1a1a2e">Configuration at a Glance</text>
+  <text x="450" y="58" text-anchor="middle" font-size="13" fill="#6b7280">Sensible defaults, tunable when needed -- YAML or Python</text>
+
+  <!-- Row 1: Chunking Controls -->
+  <rect x="30" y="80" width="410" height="180" rx="12" fill="#ffffff" stroke="#c7d2fe" stroke-width="1.5" filter="url(#shadow6)"/>
+  <rect x="30" y="80" width="410" height="32" rx="12" fill="#6366f1"/>
+  <rect x="30" y="98" width="410" height="14" fill="#6366f1"/>
+  <text x="50" y="102" font-size="12" font-weight="700" fill="#ffffff">Chunking Controls</text>
+
+  <g transform="translate(48, 125)" font-size="11">
+    <text x="0" y="0" font-weight="600" fill="#374151">similarity_threshold</text>
+    <text x="200" y="0" fill="#6b7280">0.0 - 1.0</text>
+    <text x="285" y="0" fill="#4338ca" font-weight="600">default: 0.5</text>
+    <line x1="0" y1="8" x2="375" y2="8" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="28" font-weight="600" fill="#374151">min_chunk_tokens</text>
+    <text x="200" y="28" fill="#6b7280">integer</text>
+    <text x="285" y="28" fill="#4338ca" font-weight="600">default: 50</text>
+    <line x1="0" y1="36" x2="375" y2="36" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="56" font-weight="600" fill="#374151">max_chunk_tokens</text>
+    <text x="200" y="56" fill="#6b7280">integer</text>
+    <text x="285" y="56" fill="#4338ca" font-weight="600">default: 500</text>
+    <line x1="0" y1="64" x2="375" y2="64" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="84" font-weight="600" fill="#374151">atomize_sentences_per_paragraph</text>
+    <text x="285" y="84" fill="#4338ca" font-weight="600">default: 2</text>
+    <line x1="0" y1="92" x2="375" y2="92" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="112" font-weight="600" fill="#374151">atomize_min_sentences</text>
+    <text x="285" y="112" fill="#4338ca" font-weight="600">default: 6</text>
+  </g>
+
+  <!-- Row 1: LLM Settings -->
+  <rect x="460" y="80" width="410" height="180" rx="12" fill="#ffffff" stroke="#e9d5ff" stroke-width="1.5" filter="url(#shadow6)"/>
+  <rect x="460" y="80" width="410" height="32" rx="12" fill="#7c3aed"/>
+  <rect x="460" y="98" width="410" height="14" fill="#7c3aed"/>
+  <text x="480" y="102" font-size="12" font-weight="700" fill="#ffffff">LLM Settings</text>
+
+  <g transform="translate(478, 125)" font-size="11">
+    <text x="0" y="0" font-weight="600" fill="#374151">model</text>
+    <text x="200" y="0" fill="#6b7280">string</text>
+    <text x="285" y="0" fill="#7c3aed" font-weight="600">default: gpt-4o</text>
+    <line x1="0" y1="8" x2="375" y2="8" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="28" font-weight="600" fill="#374151">temperature</text>
+    <text x="200" y="28" fill="#6b7280">0.0 - 2.0</text>
+    <text x="285" y="28" fill="#7c3aed" font-weight="600">default: 0.1</text>
+    <line x1="0" y1="36" x2="375" y2="36" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="56" font-weight="600" fill="#374151">max_tokens</text>
+    <text x="200" y="56" fill="#6b7280">integer</text>
+    <text x="285" y="56" fill="#7c3aed" font-weight="600">default: 1000</text>
+    <line x1="0" y1="64" x2="375" y2="64" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="84" font-weight="600" fill="#374151">base_url</text>
+    <text x="200" y="84" fill="#6b7280">URL (optional)</text>
+    <text x="285" y="84" fill="#7c3aed" font-weight="600">OpenAI-compat</text>
+    <line x1="0" y1="92" x2="375" y2="92" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="112" font-weight="600" fill="#374151">embedding_model</text>
+    <text x="285" y="112" fill="#7c3aed" font-weight="600">all-MiniLM-L6-v2</text>
+  </g>
+
+  <!-- Row 2: Behavior -->
+  <rect x="30" y="280" width="410" height="180" rx="12" fill="#ffffff" stroke="#86efac" stroke-width="1.5" filter="url(#shadow6)"/>
+  <rect x="30" y="280" width="410" height="32" rx="12" fill="#16a34a"/>
+  <rect x="30" y="298" width="410" height="14" fill="#16a34a"/>
+  <text x="50" y="302" font-size="12" font-weight="700" fill="#ffffff">Behavior &amp; Resilience</text>
+
+  <g transform="translate(48, 325)" font-size="11">
+    <text x="0" y="0" font-weight="600" fill="#374151">retry_attempts</text>
+    <text x="200" y="0" fill="#6b7280">integer</text>
+    <text x="285" y="0" fill="#16a34a" font-weight="600">default: 2</text>
+    <line x1="0" y1="8" x2="375" y2="8" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="28" font-weight="600" fill="#374151">retry_delay</text>
+    <text x="200" y="28" fill="#6b7280">seconds</text>
+    <text x="285" y="28" fill="#16a34a" font-weight="600">default: 1.0</text>
+    <line x1="0" y1="36" x2="375" y2="36" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="56" font-weight="600" fill="#374151">fallback_enabled</text>
+    <text x="200" y="56" fill="#6b7280">bool</text>
+    <text x="285" y="56" fill="#16a34a" font-weight="600">default: true</text>
+    <line x1="0" y1="64" x2="375" y2="64" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="84" font-weight="600" fill="#374151">continue_on_error</text>
+    <text x="200" y="84" fill="#6b7280">bool</text>
+    <text x="285" y="84" fill="#16a34a" font-weight="600">default: false</text>
+    <line x1="0" y1="92" x2="375" y2="92" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="112" font-weight="600" fill="#374151">verbose</text>
+    <text x="200" y="112" fill="#6b7280">bool</text>
+    <text x="285" y="112" fill="#16a34a" font-weight="600">default: false</text>
+  </g>
+
+  <!-- Row 2: Granularity Planning -->
+  <rect x="460" y="280" width="410" height="180" rx="12" fill="#ffffff" stroke="#fcd34d" stroke-width="1.5" filter="url(#shadow6)"/>
+  <rect x="460" y="280" width="410" height="32" rx="12" fill="#ca8a04"/>
+  <rect x="460" y="298" width="410" height="14" fill="#ca8a04"/>
+  <text x="480" y="302" font-size="12" font-weight="700" fill="#ffffff">Granularity Planning</text>
+
+  <g transform="translate(478, 325)" font-size="11">
+    <text x="0" y="0" font-weight="600" fill="#374151">granularity_planning_enabled</text>
+    <text x="285" y="0" fill="#ca8a04" font-weight="600">default: true</text>
+    <line x1="0" y1="8" x2="375" y2="8" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="28" font-weight="600" fill="#374151">granularity_max_paragraphs</text>
+    <text x="285" y="28" fill="#ca8a04" font-weight="600">default: 60</text>
+    <line x1="0" y1="36" x2="375" y2="36" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="56" font-weight="600" fill="#374151">granularity_max_chars_per_paragraph</text>
+    <text x="285" y="56" fill="#ca8a04" font-weight="600">default: 280</text>
+    <line x1="0" y1="64" x2="375" y2="64" stroke="#f1f5f9" stroke-width="1"/>
+
+    <text x="0" y="90" font-size="10" fill="#6b7280">LLM scans a document sample to estimate topic</text>
+    <text x="0" y="104" font-size="10" fill="#6b7280">count and calibrate atomization before chunking.</text>
+    <text x="0" y="118" font-size="10" fill="#6b7280">Disable for faster processing with manual tuning.</text>
+  </g>
+</svg>

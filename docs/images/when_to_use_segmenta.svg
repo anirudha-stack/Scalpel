@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow5" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="500" rx="16" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-size="22" font-weight="700" fill="#1a1a2e">When to Use Segmenta</text>
+  <text x="450" y="58" text-anchor="middle" font-size="13" fill="#6b7280">Choose the right chunking strategy for your use case</text>
+
+  <!-- Good fit column -->
+  <rect x="30" y="80" width="410" height="395" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" filter="url(#shadow5)"/>
+  <rect x="30" y="80" width="410" height="38" rx="12" fill="#16a34a"/>
+  <rect x="30" y="102" width="410" height="16" fill="#16a34a"/>
+  <text x="235" y="106" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">Great Fit</text>
+
+  <!-- Good fit items -->
+  <g transform="translate(50, 132)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">Multi-topic documents</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">PDFs, manuals, policies with many distinct topics</text>
+    <text x="16" y="30" font-size="18" fill="#16a34a">&#x2713;</text>
+  </g>
+  <g transform="translate(50, 196)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">PDF-heavy pipelines</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">Extraction collapses structure; atomization fixes it</text>
+    <text x="16" y="30" font-size="18" fill="#16a34a">&#x2713;</text>
+  </g>
+  <g transform="translate(50, 260)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">Quality-sensitive RAG</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">When retrieval precision justifies LLM token spend</text>
+    <text x="16" y="30" font-size="18" fill="#16a34a">&#x2713;</text>
+  </g>
+  <g transform="translate(50, 324)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">Auditable chunking</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">JSONL trace logs, metrics, deterministic pipeline</text>
+    <text x="16" y="30" font-size="18" fill="#16a34a">&#x2713;</text>
+  </g>
+  <g transform="translate(50, 388)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">Rich metadata needed</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">Intent, keywords, questions for hybrid search</text>
+    <text x="16" y="30" font-size="18" fill="#16a34a">&#x2713;</text>
+  </g>
+
+  <!-- Not necessary column -->
+  <rect x="460" y="80" width="410" height="395" rx="12" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5" filter="url(#shadow5)"/>
+  <rect x="460" y="80" width="410" height="38" rx="12" fill="#6b7280"/>
+  <rect x="460" y="102" width="410" height="16" fill="#6b7280"/>
+  <text x="665" y="106" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">Probably Overkill</text>
+
+  <!-- Not necessary items -->
+  <g transform="translate(480, 132)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">Short, single-topic docs</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">Blog posts, emails -- one chunk is fine</text>
+    <text x="16" y="30" font-size="14" fill="#9ca3af">--</text>
+  </g>
+  <g transform="translate(480, 196)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">Keyword-only search</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">BM25 / Elasticsearch without semantic retrieval</text>
+    <text x="16" y="30" font-size="14" fill="#9ca3af">--</text>
+  </g>
+  <g transform="translate(480, 260)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">Extreme token budget constraints</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">LLM boundary validation + enrichment has cost</text>
+    <text x="16" y="30" font-size="14" fill="#9ca3af">--</text>
+  </g>
+  <g transform="translate(480, 324)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">Already-structured data</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">JSON records, CSVs, databases -- already chunked</text>
+    <text x="16" y="30" font-size="14" fill="#9ca3af">--</text>
+  </g>
+  <g transform="translate(480, 388)">
+    <rect x="0" y="0" width="370" height="56" rx="8" fill="#ffffff" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="40" y="22" font-size="12" font-weight="600" fill="#374151">Real-time / streaming ingestion</text>
+    <text x="40" y="40" font-size="11" fill="#6b7280">Segmenta is batch-oriented (single-file processing)</text>
+    <text x="16" y="30" font-size="14" fill="#9ca3af">--</text>
+  </g>
+</svg>

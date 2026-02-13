@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow4" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+    <marker id="plugArrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#6366f1"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="480" rx="16" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="450" y="38" text-anchor="middle" font-size="22" font-weight="700" fill="#1a1a2e">Pluggable Architecture</text>
+  <text x="450" y="58" text-anchor="middle" font-size="13" fill="#6b7280">Swap any provider without changing the pipeline</text>
+
+  <!-- Center: Pipeline Core -->
+  <rect x="290" y="100" width="320" height="280" rx="16" fill="#ffffff" stroke="#6366f1" stroke-width="2.5" filter="url(#shadow4)"/>
+  <rect x="290" y="100" width="320" height="40" rx="16" fill="#6366f1"/>
+  <rect x="290" y="125" width="320" height="15" fill="#6366f1"/>
+  <text x="450" y="126" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">Segmenta Pipeline</text>
+
+  <!-- Pipeline stages inside -->
+  <g transform="translate(310, 152)">
+    <rect x="0" y="0" width="280" height="24" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="140" y="16" text-anchor="middle" font-size="11" fill="#374151">1. Parse</text>
+    <rect x="0" y="30" width="280" height="24" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="140" y="46" text-anchor="middle" font-size="11" fill="#374151">2. Segment</text>
+    <rect x="0" y="60" width="280" height="24" rx="4" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1"/>
+    <text x="140" y="76" text-anchor="middle" font-size="11" fill="#7c3aed">3. Plan Granularity (LLM)</text>
+    <rect x="0" y="90" width="280" height="24" rx="4" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="140" y="106" text-anchor="middle" font-size="11" fill="#374151">4. Atomize</text>
+    <rect x="0" y="120" width="280" height="24" rx="4" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1"/>
+    <text x="140" y="136" text-anchor="middle" font-size="11" fill="#4338ca">5. Boundary Detect (Embeddings)</text>
+    <rect x="0" y="150" width="280" height="24" rx="4" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1"/>
+    <text x="140" y="166" text-anchor="middle" font-size="11" fill="#7c3aed">6. Boundary Validate (LLM)</text>
+    <rect x="0" y="180" width="280" height="24" rx="4" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1"/>
+    <text x="140" y="196" text-anchor="middle" font-size="11" fill="#7c3aed">7. Enrich (LLM)</text>
+    <rect x="0" y="210" width="280" height="24" rx="4" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+    <text x="140" y="226" text-anchor="middle" font-size="11" fill="#16a34a">8. Output</text>
+  </g>
+
+  <!-- LEFT: Parsers -->
+  <rect x="20" y="115" width="225" height="155" rx="12" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5" filter="url(#shadow4)"/>
+  <text x="132" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#ea580c">Document Parsers</text>
+  <text x="132" y="155" text-anchor="middle" font-size="10" fill="#6b7280">DocumentParser ABC</text>
+
+  <rect x="40" y="168" width="185" height="24" rx="4" fill="#ffffff" stroke="#fed7aa" stroke-width="1"/>
+  <text x="132" y="184" text-anchor="middle" font-size="11" fill="#374151">PDFParser (PyMuPDF)</text>
+  <rect x="40" y="196" width="185" height="24" rx="4" fill="#ffffff" stroke="#fed7aa" stroke-width="1"/>
+  <text x="132" y="212" text-anchor="middle" font-size="11" fill="#374151">MarkdownParser</text>
+  <rect x="40" y="224" width="185" height="24" rx="4" fill="#ffffff" stroke="#fed7aa" stroke-width="1"/>
+  <text x="132" y="240" text-anchor="middle" font-size="11" fill="#374151">TextParser</text>
+  <rect x="40" y="252" width="185" height="12" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="132" y="262" text-anchor="middle" font-size="9" fill="#a16207">+ register your own</text>
+
+  <line x1="247" y1="190" x2="288" y2="175" stroke="#6366f1" stroke-width="1.5" marker-end="url(#plugArrow)"/>
+
+  <!-- LEFT: LLM Providers -->
+  <rect x="20" y="290" width="225" height="155" rx="12" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.5" filter="url(#shadow4)"/>
+  <text x="132" y="315" text-anchor="middle" font-size="13" font-weight="700" fill="#7c3aed">LLM Providers</text>
+  <text x="132" y="330" text-anchor="middle" font-size="10" fill="#6b7280">LLMProvider ABC</text>
+
+  <rect x="40" y="342" width="185" height="24" rx="4" fill="#ffffff" stroke="#e9d5ff" stroke-width="1"/>
+  <text x="132" y="358" text-anchor="middle" font-size="11" fill="#374151">OpenAI / GPT-4o</text>
+  <rect x="40" y="370" width="185" height="24" rx="4" fill="#ffffff" stroke="#e9d5ff" stroke-width="1"/>
+  <text x="132" y="386" text-anchor="middle" font-size="11" fill="#374151">Groq / Llama 3.3</text>
+  <rect x="40" y="398" width="185" height="24" rx="4" fill="#ffffff" stroke="#e9d5ff" stroke-width="1"/>
+  <text x="132" y="414" text-anchor="middle" font-size="11" fill="#374151">Azure OpenAI</text>
+  <rect x="40" y="426" width="185" height="12" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="132" y="436" text-anchor="middle" font-size="9" fill="#a16207">+ your custom provider</text>
+
+  <line x1="247" y1="370" x2="288" y2="340" stroke="#6366f1" stroke-width="1.5" marker-end="url(#plugArrow)"/>
+
+  <!-- RIGHT: Embedding Providers -->
+  <rect x="655" y="115" width="225" height="140" rx="12" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5" filter="url(#shadow4)"/>
+  <text x="767" y="140" text-anchor="middle" font-size="13" font-weight="700" fill="#4338ca">Embedding Providers</text>
+  <text x="767" y="155" text-anchor="middle" font-size="10" fill="#6b7280">EmbeddingProvider ABC</text>
+
+  <rect x="675" y="168" width="185" height="24" rx="4" fill="#ffffff" stroke="#c7d2fe" stroke-width="1"/>
+  <text x="767" y="184" text-anchor="middle" font-size="11" fill="#374151">all-MiniLM-L6-v2</text>
+  <rect x="675" y="196" width="185" height="24" rx="4" fill="#ffffff" stroke="#c7d2fe" stroke-width="1"/>
+  <text x="767" y="212" text-anchor="middle" font-size="11" fill="#374151">Any Sentence Transformer</text>
+  <rect x="675" y="224" width="185" height="24" rx="4" fill="#ffffff" stroke="#c7d2fe" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="767" y="240" text-anchor="middle" font-size="9" fill="#a16207">+ your custom embeddings</text>
+
+  <line x1="653" y1="190" x2="612" y2="175" stroke="#6366f1" stroke-width="1.5" marker-end="url(#plugArrow)"/>
+
+  <!-- RIGHT: Output Formatters -->
+  <rect x="655" y="290" width="225" height="125" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" filter="url(#shadow4)"/>
+  <text x="767" y="315" text-anchor="middle" font-size="13" font-weight="700" fill="#16a34a">Output Formatters</text>
+  <text x="767" y="330" text-anchor="middle" font-size="10" fill="#6b7280">OutputFormatter ABC</text>
+
+  <rect x="675" y="342" width="185" height="24" rx="4" fill="#ffffff" stroke="#86efac" stroke-width="1"/>
+  <text x="767" y="358" text-anchor="middle" font-size="11" fill="#374151">Markdown + YAML</text>
+  <rect x="675" y="370" width="185" height="24" rx="4" fill="#ffffff" stroke="#86efac" stroke-width="1"/>
+  <text x="767" y="386" text-anchor="middle" font-size="11" fill="#374151">JSONL Debug Traces</text>
+  <rect x="675" y="398" width="185" height="12" rx="2" fill="#fef3c7" stroke="#fcd34d" stroke-width="1" stroke-dasharray="3,2"/>
+  <text x="767" y="408" text-anchor="middle" font-size="9" fill="#a16207">+ your custom formatter</text>
+
+  <line x1="653" y1="370" x2="612" y2="365" stroke="#6366f1" stroke-width="1.5" marker-end="url(#plugArrow)"/>
+</svg>

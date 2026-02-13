@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
+  <defs>
+    <filter id="shadow2" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrowRight" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#6366f1"/>
+    </marker>
+    <marker id="arrowDown" markerWidth="6" markerHeight="8" refX="3" refY="8" orient="auto">
+      <path d="M0,0 L6,0 L3,8 Z" fill="#6366f1"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="600" rx="16" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="500" y="38" text-anchor="middle" font-size="22" font-weight="700" fill="#1a1a2e">Two-Stage Boundary Detection</text>
+  <text x="500" y="60" text-anchor="middle" font-size="13" fill="#6b7280">Embeddings find candidates fast. LLM validates with reasoning.</text>
+
+  <!-- Input: Text units -->
+  <rect x="30" y="85" width="940" height="70" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow2)"/>
+  <text x="50" y="108" font-size="12" font-weight="700" fill="#475569">ATOMIZED TEXT UNITS</text>
+  <g transform="translate(50, 118)">
+    <rect x="0" y="0" width="100" height="26" rx="4" fill="#e0e7ff" stroke="#a5b4fc" stroke-width="1"/>
+    <text x="50" y="17" text-anchor="middle" font-size="10" fill="#4338ca">Unit 1</text>
+    <rect x="110" y="0" width="100" height="26" rx="4" fill="#e0e7ff" stroke="#a5b4fc" stroke-width="1"/>
+    <text x="160" y="17" text-anchor="middle" font-size="10" fill="#4338ca">Unit 2</text>
+    <rect x="220" y="0" width="100" height="26" rx="4" fill="#e0e7ff" stroke="#a5b4fc" stroke-width="1"/>
+    <text x="270" y="17" text-anchor="middle" font-size="10" fill="#4338ca">Unit 3</text>
+    <rect x="330" y="0" width="100" height="26" rx="4" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1"/>
+    <text x="380" y="17" text-anchor="middle" font-size="10" fill="#be185d">Unit 4</text>
+    <rect x="440" y="0" width="100" height="26" rx="4" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1"/>
+    <text x="490" y="17" text-anchor="middle" font-size="10" fill="#be185d">Unit 5</text>
+    <rect x="550" y="0" width="100" height="26" rx="4" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
+    <text x="600" y="17" text-anchor="middle" font-size="10" fill="#92400e">Unit 6</text>
+    <rect x="660" y="0" width="100" height="26" rx="4" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
+    <text x="710" y="17" text-anchor="middle" font-size="10" fill="#92400e">Unit 7</text>
+    <rect x="770" y="0" width="100" height="26" rx="4" fill="#d1fae5" stroke="#6ee7b7" stroke-width="1"/>
+    <text x="820" y="17" text-anchor="middle" font-size="10" fill="#065f46">Unit 8</text>
+  </g>
+
+  <!-- Arrow down -->
+  <line x1="500" y1="158" x2="500" y2="180" stroke="#6366f1" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+  <!-- STAGE 1: Embeddings -->
+  <rect x="30" y="185" width="940" height="155" rx="12" fill="#eef2ff" stroke="#c7d2fe" stroke-width="1.5" filter="url(#shadow2)"/>
+  <rect x="30" y="185" width="200" height="32" rx="12" fill="#6366f1"/>
+  <text x="130" y="206" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">STAGE 1: Embeddings</text>
+  <text x="245" y="206" font-size="11" fill="#6366f1" font-weight="600">Fast, local, runs on CPU</text>
+
+  <!-- Similarity scores -->
+  <text x="50" y="240" font-size="11" font-weight="600" fill="#475569">Adjacent cosine similarity (threshold = 0.5)</text>
+
+  <g transform="translate(50, 252)">
+    <!-- Score bars -->
+    <rect x="0" y="0" width="100" height="22" rx="4" fill="#ffffff" stroke="#c7d2fe" stroke-width="1"/>
+    <text x="50" y="15" text-anchor="middle" font-size="10" fill="#374151">1-2: <tspan font-weight="700" fill="#16a34a">0.82</tspan></text>
+
+    <rect x="110" y="0" width="100" height="22" rx="4" fill="#ffffff" stroke="#c7d2fe" stroke-width="1"/>
+    <text x="160" y="15" text-anchor="middle" font-size="10" fill="#374151">2-3: <tspan font-weight="700" fill="#16a34a">0.76</tspan></text>
+
+    <rect x="220" y="0" width="100" height="22" rx="4" fill="#ffffff" stroke="#fca5a5" stroke-width="2"/>
+    <text x="270" y="15" text-anchor="middle" font-size="10" fill="#374151">3-4: <tspan font-weight="700" fill="#dc2626">0.31</tspan></text>
+
+    <rect x="330" y="0" width="100" height="22" rx="4" fill="#ffffff" stroke="#c7d2fe" stroke-width="1"/>
+    <text x="380" y="15" text-anchor="middle" font-size="10" fill="#374151">4-5: <tspan font-weight="700" fill="#16a34a">0.71</tspan></text>
+
+    <rect x="440" y="0" width="100" height="22" rx="4" fill="#ffffff" stroke="#fca5a5" stroke-width="2"/>
+    <text x="490" y="15" text-anchor="middle" font-size="10" fill="#374151">5-6: <tspan font-weight="700" fill="#dc2626">0.38</tspan></text>
+
+    <rect x="550" y="0" width="100" height="22" rx="4" fill="#ffffff" stroke="#fca5a5" stroke-width="2"/>
+    <text x="600" y="15" text-anchor="middle" font-size="10" fill="#374151">6-7: <tspan font-weight="700" fill="#dc2626">0.44</tspan></text>
+
+    <rect x="660" y="0" width="100" height="22" rx="4" fill="#ffffff" stroke="#fca5a5" stroke-width="2"/>
+    <text x="710" y="15" text-anchor="middle" font-size="10" fill="#374151">7-8: <tspan font-weight="700" fill="#dc2626">0.29</tspan></text>
+  </g>
+
+  <!-- Proposed boundaries -->
+  <text x="50" y="300" font-size="11" font-weight="600" fill="#475569">Proposed boundaries (below threshold)</text>
+  <g transform="translate(50, 308)">
+    <rect x="0" y="0" width="145" height="22" rx="11" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+    <text x="72" y="15" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">B1: between 3-4</text>
+    <rect x="155" y="0" width="145" height="22" rx="11" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+    <text x="227" y="15" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">B2: between 5-6</text>
+    <rect x="310" y="0" width="145" height="22" rx="11" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+    <text x="382" y="15" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">B3: between 6-7</text>
+    <rect x="465" y="0" width="145" height="22" rx="11" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+    <text x="537" y="15" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">B4: between 7-8</text>
+    <text x="640" y="15" font-size="11" fill="#6b7280">4 candidates</text>
+  </g>
+
+  <!-- Arrow down -->
+  <line x1="500" y1="343" x2="500" y2="365" stroke="#6366f1" stroke-width="2" marker-end="url(#arrowDown)"/>
+
+  <!-- STAGE 2: LLM -->
+  <rect x="30" y="370" width="940" height="200" rx="12" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.5" filter="url(#shadow2)"/>
+  <rect x="30" y="370" width="230" height="32" rx="12" fill="#7c3aed"/>
+  <text x="145" y="391" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">STAGE 2: LLM Validation</text>
+  <text x="275" y="391" font-size="11" fill="#7c3aed" font-weight="600">Smart, contextual reasoning</text>
+
+  <!-- LLM reviews each boundary -->
+  <text x="50" y="425" font-size="11" font-weight="600" fill="#475569">LLM reviews each candidate with surrounding context</text>
+
+  <!-- B1: KEEP -->
+  <g transform="translate(50, 438)">
+    <rect x="0" y="0" width="210" height="55" rx="8" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+    <text x="15" y="18" font-size="11" font-weight="700" fill="#374151">B1: Units 3 / 4</text>
+    <rect x="155" y="4" width="44" height="18" rx="9" fill="#dcfce7"/>
+    <text x="177" y="17" text-anchor="middle" font-size="10" font-weight="700" fill="#16a34a">KEEP</text>
+    <text x="15" y="35" font-size="10" fill="#6b7280">"Clear topic shift from eligibility</text>
+    <text x="15" y="47" font-size="10" fill="#6b7280"> to financial planning"</text>
+  </g>
+
+  <!-- B2: MERGE -->
+  <g transform="translate(275, 438)">
+    <rect x="0" y="0" width="210" height="55" rx="8" fill="#ffffff" stroke="#fca5a5" stroke-width="2"/>
+    <text x="15" y="18" font-size="11" font-weight="700" fill="#374151">B2: Units 5 / 6</text>
+    <rect x="148" y="4" width="52" height="18" rx="9" fill="#fef2f2"/>
+    <text x="174" y="17" text-anchor="middle" font-size="10" font-weight="700" fill="#dc2626">MERGE</text>
+    <text x="15" y="35" font-size="10" fill="#6b7280">"Both discuss housing benefits.</text>
+    <text x="15" y="47" font-size="10" fill="#6b7280"> Should remain in one chunk."</text>
+  </g>
+
+  <!-- B3: ADJUST -->
+  <g transform="translate(500, 438)">
+    <rect x="0" y="0" width="210" height="55" rx="8" fill="#ffffff" stroke="#fcd34d" stroke-width="2"/>
+    <text x="15" y="18" font-size="11" font-weight="700" fill="#374151">B3: Units 6 / 7</text>
+    <rect x="138" y="4" width="62" height="18" rx="9" fill="#fef9c3"/>
+    <text x="169" y="17" text-anchor="middle" font-size="10" font-weight="700" fill="#a16207">ADJUST</text>
+    <text x="15" y="35" font-size="10" fill="#6b7280">"Shift boundary one position</text>
+    <text x="15" y="47" font-size="10" fill="#6b7280"> later, mid-sentence split."</text>
+  </g>
+
+  <!-- B4: KEEP -->
+  <g transform="translate(725, 438)">
+    <rect x="0" y="0" width="210" height="55" rx="8" fill="#ffffff" stroke="#86efac" stroke-width="2"/>
+    <text x="15" y="18" font-size="11" font-weight="700" fill="#374151">B4: Units 7 / 8</text>
+    <rect x="155" y="4" width="44" height="18" rx="9" fill="#dcfce7"/>
+    <text x="177" y="17" text-anchor="middle" font-size="10" font-weight="700" fill="#16a34a">KEEP</text>
+    <text x="15" y="35" font-size="10" fill="#6b7280">"Compliance and data tracking</text>
+    <text x="15" y="47" font-size="10" fill="#6b7280"> are separate concerns."</text>
+  </g>
+
+  <!-- Final result -->
+  <rect x="50" y="508" width="900" height="48" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="500" y="528" text-anchor="middle" font-size="12" font-weight="700" fill="#16a34a">RESULT: 4 candidates -> 2 KEEP + 1 ADJUST + 1 MERGE = 3 validated boundaries</text>
+  <text x="500" y="546" text-anchor="middle" font-size="11" fill="#6b7280">Embeddings caught obvious shifts. LLM corrected the false positive and refined placement.</text>
+</svg>
